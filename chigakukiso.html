@@ -277,6 +277,18 @@ code{background:#eef2f8;border-radius:4px;padding:1px 5px;font-size:12.5px;}
 .qlist .ans{font-size:13.5px;color:#1d6b48;font-weight:700;}
 .filters .chip b{color:#1f6fb2;margin-right:4px;}
 .filters .chip.on b{color:#fff;}
+
+.codebox{background:#fdf8ec;border:2px solid #f0dcae;border-radius:12px;padding:14px 16px;margin-top:14px;}
+.cbttl{font-size:13.5px;color:#8a5316;line-height:1.7;}
+.cbcode{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:21px;font-weight:800;
+  letter-spacing:.06em;background:#fff;border:1px solid #e6cf9e;border-radius:8px;
+  padding:12px 14px;margin-top:9px;text-align:center;word-break:break-all;color:#7a4a10;
+  user-select:all;-webkit-user-select:all;}
+.cbnote{font-size:12px;color:#8a5316;align-self:center;}
+.codein{width:100%;min-height:96px;padding:11px 14px;font-size:14px;border-radius:10px;
+  border:1px solid var(--line);background:#fff;color:var(--ink);
+  font-family:ui-monospace,Menlo,Consolas,monospace;resize:vertical;}
+.codein:focus{outline:none;border-color:var(--accent);}
 </style>
 </head>
 <body>
@@ -302,7 +314,7 @@ code{background:#eef2f8;border-radius:4px;padding:1px 5px;font-size:12.5px;}
    出てきた URL を下の "" の中に貼り付けてください。
    （空のままでも動きます。その場合、結果は端末内にだけ残ります）
    =================================================================== */
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbx-oCMhP6T10z7wcFXvkwScE02_BKh029JHAyHtzzrxKBzmPORxU0j8u1JH5nVTj8icbA/exec";
+const SHEET_URL = "";
 
 /* =========================================================
    問題データ　※すべて4択（type:"mc" / c:選択肢4つ / ai:正答index）
@@ -1573,7 +1585,7 @@ function deferKC(kc){ S.kc[kc].deferOn = todayStr(); saveState(); }
 /* =========================================================
    スプレッドシートへの送信
    ========================================================= */
-const APP_VER = "3.1";
+const APP_VER = "3.2";
 const CHECK_N   = 10;      // 小単元ごとの確認テストの問題数
 const PASS_RATE = 0.8;     // 合格ライン（8割）
 
@@ -1625,16 +1637,47 @@ function jsonp(url, params, timeout){
   });
 }
 
+let lastResp = null;
+const sleep = ms => new Promise(r=>setTimeout(r, ms));
+/* 送信の流れ
+   1. JSONP で送る。{ok:true} が返ればそこで確定。
+   2. 返ってこないとき（混雑して時間切れ、通信が不安定 など）は
+      POST でも投げたうえで、少し待ってから「本当に記録されたか」を
+      スクリプトに問い合わせる（verify）。記録が確認できれば成功とする。
+   3. それでも確認できなければ失敗として扱い、キューに残す。
+   同じ送信キーの行はスクリプト側で無視されるので、二重記録にはならない。 */
 async function postResult(data){
   const url = sheetUrl();
+  lastResp = null;
   if(!url) return "nourl";
-  const r = await jsonp(url, data);            // ← 本命
+  const r = await jsonp(url, data);
+  lastResp = r;
   if(r && r.ok) return "ok";
-  try{                                          // 予備（応答は読めない）
+  try{   // 念のため POST でも投げておく（この応答は読めない）
     await fetch(url, {method:"POST", mode:"no-cors",
       headers:{"Content-Type":"text/plain;charset=utf-8"}, body: JSON.stringify(data)});
-    return "sent";
-  }catch(e){ return "fail"; }
+  }catch(e){}
+  for(const wait of [2500, 5000]){   // 記録されたかを確認する
+    await sleep(wait);
+    const v = await jsonp(url, {verify:1, key:data.key, sid:data.sid}, 12000);
+    if(v && v.ok && v.found){ lastResp = v; return "ok"; }
+  }
+  return "fail";
+}
+
+/* 提出コード　例）2105-312-09/10-G-04,11 */
+function subCode(d){
+  const w = String(d.wrong||"").split(" ").filter(Boolean)
+              .map(x=>x.split("-")[1]).join(",");
+  return [d.sid, d.code, String(d.ok)+"/"+d.n, (d.pass==="合格"?"G":"F")].join("-") + (w? "-"+w : "");
+}
+function parseCode(line){
+  const m = String(line).trim().match(/^(\d{4})-(\d{3})-(\d+)\/(\d+)-([GF])(?:-([\d,]+))?$/);
+  if(!m) return null;
+  const sid=m[1], code=m[2], ok=+m[3], n=+m[4], pass=(m[5]==="G"?"合格":"不合格");
+  const wrong = (m[6]||"").split(",").filter(Boolean).map(x=>code+"-"+x).join(" ");
+  return {sid, cls:sid[1], no:sid.slice(2), code, ok, n,
+          rate: n? Math.round(ok/n*100):0, pass, wrong};
 }
 
 function queueResult(data){ S.outbox.push(data); saveState(); }
@@ -1757,6 +1800,7 @@ function renderTop(){
       ${out?`<div class="warn">未送信の記録が ${out} 件あります。ネットにつながったら自動で送られます。
         <button class="btn ghost tiny" id="flush">いま送る</button></div>`:""}
       ${isTeacher()?`<div class="foot2"><a href="#" id="adm">先生用の設定</a></div>`:""}
+      <p class="foot" style="margin-top:14px;">ver ${APP_VER}</p>
     </div>`;
   bindSid();
   document.querySelectorAll(".ucard").forEach(c=>{
@@ -1991,18 +2035,20 @@ async function endSession(){
   if(S.results.length>300) S.results = S.results.slice(-300);
   saveState();
 
-  drawResult(data, rate, need, passed, "送信中…");
+  drawResult(data, rate, need, passed, "送信中…", "");
   let r = "nourl";
   if(sheetUrl()) r = await postResult(data);
   if(r==="fail") queueResult(data);
   drawResult(data, rate, need, passed,
-    r==="ok"   ? "◯ 送信しました" :
-    r==="sent" ? "◯ 送信しました" :
-    r==="fail" ? "× 送信できませんでした。次に開いたとき自動的に送り直します" :
-                 "－ 記録先が未設定です（この端末にだけ保存）");
+    r==="ok"   ? ("◯ 先生に送信しました" + (lastResp && lastResp.sheet
+                   ? "（" + lastResp.sheet + " の「" + (lastResp.tab||"記録") + "」タブ "
+                     + (lastResp.row? lastResp.row+"行目":"") + "）" : "")) :
+    r==="fail" ? "× 送信できませんでした" :
+                 "－ 記録先が未設定です（この端末にだけ保存）",
+    r);
 }
 
-function drawResult(data, rate, need, passed, sendMsg){
+function drawResult(data, rate, need, passed, sendMsg, state){
   const weak = data.kcs.split(" ").filter(x=>x.endsWith(":0")).map(x=>x.split(":")[0]);
   const msg = passed
     ? (data.ok===data.n ? "満点です。文句なしの合格。" : "合格ラインをこえました。よくできました。")
@@ -2020,6 +2066,17 @@ function drawResult(data, rate, need, passed, sendMsg){
         <span>${esc(sendMsg)}</span>
         <span class="sendsid">${esc(S.sid)}</span>
       </div>
+      ${state==="fail"||state==="nourl" ? `
+        <div class="codebox">
+          <div class="cbttl">${state==="fail"
+            ? "先生に送れませんでした。下の<b>提出コード</b>を Classroom に貼るか、この画面を撮って提出してください。"
+            : "記録先が設定されていません。下の<b>提出コード</b>を提出してください。"}</div>
+          <div class="cbcode" id="subcode">${esc(subCode(data))}</div>
+          <div class="btnrow" style="margin-top:8px;">
+            <button class="btn ghost tiny" id="copycode">コードをコピー</button>
+            ${state==="fail"?`<span class="cbnote">学校の端末で開き直すと、たまった記録は自動で送られます。</span>`:""}
+          </div>
+        </div>` : ""}
       ${data.wrong?`<div class="note"><b>まちがえた問題</b>　${esc(data.wrong.split(" ").join("、"))}
         ${weak.length?`<br><b>もう一度確認したい項目</b><br>${weak.map(k=>"・"+esc(KCS[k].name)).join("<br>")}`:""}</div>`:""}
       <div class="btnrow" style="justify-content:center;">
@@ -2027,6 +2084,18 @@ function drawResult(data, rate, need, passed, sendMsg){
         <button class="btn ghost" id="top">単元をえらぶ</button>
       </div>
     </div>`;
+  const cc=$("#copycode");
+  if(cc) cc.onclick=()=>{
+    const t = $("#subcode").textContent;
+    const done = ()=>{ cc.textContent="コピーしました"; setTimeout(()=>cc.textContent="コードをコピー",1800); };
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(done, ()=>sel()); }
+    else sel();
+    function sel(){
+      const r=document.createRange(); r.selectNodeContents($("#subcode"));
+      const s2=getSelection(); s2.removeAllRanges(); s2.addRange(r);
+      try{ document.execCommand("copy"); done(); }catch(e){ cc.textContent="長押しで選択してコピー"; }
+    }
+  };
   const b=$("#back"); if(b) b.onclick=()=>{ view = (sessKind==="check")?"check":"drill"; render(); };
   const t=$("#top");  if(t) t.onclick=()=>{ view="top"; curUnit=null; render(); };
   window.scrollTo({top:0,behavior:"smooth"});
@@ -2106,6 +2175,18 @@ function renderAdmin(){
         <button class="btn ghost" id="csv">この端末の記録をCSVで書き出す</button>
       </div>
 
+      <p class="lb">提出コードの展開（送信できなかった生徒のぶん）</p>
+      <p class="muted" style="margin:0 0 6px;font-size:12.5px;">
+        Classroom などで集めた提出コードを貼り付けて「展開」を押すと、シートに貼れる形に直します。
+        1行に1つ、複数まとめて貼れます。</p>
+      <textarea class="codein" id="codein" placeholder="2105-312-9/10-G-04&#10;2118-312-6/10-F-02,05,09,11"></textarea>
+      <div class="btnrow">
+        <button class="btn" id="codego">展開する</button>
+        <button class="btn ghost" id="codecopy">結果をコピー</button>
+        <button class="btn ghost" id="codecsv">CSVで書き出す</button>
+      </div>
+      <div id="codeout"></div>
+
       <p class="lb">問題番号の対照表</p>
       <div class="btnrow">
         <button class="btn ghost" id="qlist">問題一覧を開く（番号から問題を引く）</button>
@@ -2125,11 +2206,17 @@ function renderAdmin(){
     const u = $("#urlin").value.trim() || url;
     if(!u){ $("#urlmsg").textContent="URLを入力してください。"; return; }
     $("#urlmsg").textContent="接続中…";
-    try{
-      const r = await fetch(u+"?ping=1"); const j = await r.json();
-      $("#urlmsg").textContent = j && j.ok ? "つながりました。シート：" + (j.sheet||"") : "応答が想定と違います。";
-    }catch(e){
-      $("#urlmsg").textContent = "応答を読み取れませんでした。書き込みだけは通っている可能性があります（テスト送信で確認してください）。";
+    const j = await jsonp(u, {ping:1});
+    if(j && j.ok){
+      $("#urlmsg").innerHTML = "つながりました。書き込み先 → ファイル「<b>"+esc(j.sheet||"?")+
+        "</b>」の「<b>"+esc(j.tab||"記録")+"</b>」タブ" +
+        (j.url? '<br><a href="'+esc(j.url)+'" target="_blank">'+esc(j.url)+'</a>' : "");
+    }else if(j){
+      $("#urlmsg").textContent = "スクリプトがエラーを返しました：" + (j.error||"内容不明");
+    }else{
+      $("#urlmsg").textContent = "応答がありません。URLが /exec で終わっているか、"
+        + "デプロイの「アクセスできるユーザー」が全員になっているか、"
+        + "スクリプトが最新版か（診断機能のあるもの）を確認してください。";
     }
   };
   $("#flush2").onclick = async ()=>{ const n = await flushOutbox(); $("#urlmsg").textContent = n+" 件送信しました。"; render(); };
@@ -2146,6 +2233,44 @@ function renderAdmin(){
   $("#reset").onclick = ()=>{ if(confirm("この端末の学習記録と出席番号をすべて消します。よろしいですか？")){ resetState(); view="top"; curUnit=null; render(); } };
   $("#back").onclick = ()=>{ view="top"; curUnit=null; render(); };
   $("#qlist").onclick = ()=>{ view="list"; render(); };
+
+  let expanded = [];
+  const doExpand = ()=>{
+    const lines = $("#codein").value.split(/[\r\n\s、]+/).filter(Boolean);
+    const ok=[], ng=[];
+    lines.forEach(l=>{ const r=parseCode(l); if(r) ok.push(r); else ng.push(l); });
+    expanded = ok;
+    $("#codeout").innerHTML = (ok.length? `
+      <table class="br"><tr><th>学籍番号</th><th>クラス</th><th>問題番号</th>
+      <th class="num">得点</th><th class="num">正答率</th><th>合否</th><th>誤答問題</th></tr>
+      ${ok.map(r=>`<tr><td>${r.sid}</td><td>${r.cls}</td><td>${r.code}</td>
+        <td class="num">${r.ok}/${r.n}</td><td class="num">${r.rate}%</td>
+        <td><span class="sres ${r.pass==="合格"?"good":"low"}">${r.pass}</span></td>
+        <td class="sub2">${esc(r.wrong)}</td></tr>`).join("")}</table>` : "")
+      + (ng.length? `<p class="siderr">読み取れなかった行：${esc(ng.join(" / "))}</p>` : "")
+      + (!ok.length && !ng.length ? `<p class="muted">コードを貼り付けてください。</p>` : "");
+  };
+  $("#codego").onclick = doExpand;
+  const tsv = ()=>["学籍番号\tクラス\t問題番号\t出題数\t得点\t正答率\t合否\t誤答問題"]
+    .concat(expanded.map(r=>[r.sid,r.cls,r.code,r.n,r.ok,r.rate,r.pass,r.wrong].join("\t"))).join("\n");
+  $("#codecopy").onclick = ()=>{
+    if(!expanded.length){ doExpand(); }
+    if(!expanded.length) return;
+    const t = tsv();
+    if(navigator.clipboard) navigator.clipboard.writeText(t).then(
+      ()=>{ $("#codecopy").textContent="コピーしました"; setTimeout(()=>$("#codecopy").textContent="結果をコピー",1800); },
+      ()=>alert(t));
+    else alert(t);
+  };
+  $("#codecsv").onclick = ()=>{
+    if(!expanded.length) doExpand();
+    if(!expanded.length) return;
+    const csv = "\ufeff" + tsv().split("\n").map(l=>l.split("\t")
+      .map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\r\n");
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+    a.download="提出コード_"+todayStr()+".csv"; a.click();
+  };
   $("#qcsv").onclick = ()=>{
     const head = ["問題番号","単元","小単元","レベル","項目","問題文","正解","誤答選択肢"];
     const rows = ALL.slice().sort((a,b)=>a.qid.localeCompare(b.qid)).map(q=>[
