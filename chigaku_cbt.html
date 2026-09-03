@@ -256,6 +256,53 @@
       padding: 15px 16px;
     }
 
+    .foldhead {
+      cursor: pointer;
+      justify-content: space-between;
+      user-select: none;
+    }
+
+    .foldhead:active { opacity: 0.7; }
+
+    .foldmark {
+      font-size: 12px;
+      color: var(--tx2);
+      font-weight: 800;
+      flex: none;
+    }
+
+    .folded { display: none; }
+
+    .leadbox {
+      border: 1px solid var(--border);
+      border-left: 5px solid var(--primary);
+      border-radius: 10px;
+      margin-bottom: 14px;
+      overflow: hidden;
+      background: #FFFDF6;
+    }
+
+    .leadhead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 12px;
+      font-size: 12.5px;
+      font-weight: 800;
+      color: var(--ink);
+      background: var(--primary-pale);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .leadhead:active { background: var(--primary-light); }
+
+    .leadbox .lead {
+      border: none;
+      border-radius: 0;
+      margin: 0;
+    }
+
     .lead {
       background: #FFFDF6;
       border: 1px solid var(--border);
@@ -1717,7 +1764,11 @@ const screens = {
     </div>
 
     <div class="card">
-      <h2>📑 大問別演習</h2>
+      <h2 class="foldhead" onclick="toggleFold('daimon')">
+        <span>📑 大問別演習</span>
+        <span class="foldmark">${isFolded('daimon') ? '▼' : '▲'}</span>
+      </h2>
+      <div id="fold_daimon" class="${isFolded('daimon') ? 'folded' : ''}">
       <div class="cats">
         ${[1,2,3,4].map(d => {
           const info = DAIMON[d];
@@ -1735,10 +1786,15 @@ const screens = {
         1回10問（L1基礎6問・L2応用3問・L3実践1問）を、やさしい順に出題します。<br>
         パーセントは、これまでに解いた問題の正答率です。${daimonRate(1)===null&&daimonRate(2)===null&&daimonRate(3)===null&&daimonRate(4)===null ? 'まだ記録がありません。' : '<button class="clearbtn" onclick="clearStats()">記録を消去する</button>'}
       </div>
+      </div>
     </div>
 
     <div class="card">
-      <h2>🗣 会話文・レポート形式</h2>
+      <h2 class="foldhead" onclick="toggleFold('setlist')">
+        <span>🗣 会話文・レポート形式</span>
+        <span class="foldmark" id="mk_setlist">${isFolded('setlist') ? '▼' : '▲'}</span>
+      </h2>
+      <div id="fold_setlist" class="${isFolded('setlist') ? 'folded' : ''}">
       ${SETS.map(st => {
         const done = setDone(st.id);
         return '<div class="setrow" onclick="startMode(\'set\',\'' + st.id + '\')">' +
@@ -1751,6 +1807,7 @@ const screens = {
       }).join('')}
       <div class="note" style="margin-top:10px;">
         リード文を読んで、続けて出題される複数の設問に答えます。本番の第3問・第4問はこの形式で出題されることがあります。
+      </div>
       </div>
     </div>
 
@@ -1960,8 +2017,14 @@ const screens = {
           ${q.img ? '<span class="chip fig">図</span>' : ''}
         </div>
 
-        ${state.set ? '<div class="lead">' + state.set.lead.replace(/\n/g,'<br>') + '</div>' : ''}
-        ${state.set && state.set.img && IMG[state.set.img] ? '<div class="figbox"><img class="fig" src="' + IMG[state.set.img] + '" alt="共通の図" onclick="zoomFig(this.src)"><div class="fighint">タップで拡大（この大問に共通の図）</div></div>' : ''}
+        ${state.set ? '<div class="leadbox">' +
+            '<div class="leadhead" onclick="toggleLead()">' +
+              '<span>📄 リード文' + (state.leadOpen ? '' : '（たたんでいます）') + '</span>' +
+              '<span class="foldmark">' + (state.leadOpen ? '▲' : '▼') + '</span>' +
+            '</div>' +
+            (state.leadOpen ? '<div class="lead">' + state.set.lead.replace(/\n/g,'<br>') + '</div>' : '') +
+          '</div>' : ''}
+        ${state.set && state.set.img && IMG[state.set.img] && state.leadOpen ? '<div class="figbox"><img class="fig" src="' + IMG[state.set.img] + '" alt="共通の図" onclick="zoomFig(this.src)"><div class="fighint">タップで拡大（この大問に共通の図）</div></div>' : ''}
         ${q.img ? '<div class="figbox"><img class="fig" src="' + IMG[q.img] + '" alt="図" onclick="zoomFig(this.src)"><div class="fighint">タップで拡大</div></div>' : ''}
         <div class="qtext">${q.q}</div>
 
@@ -2128,6 +2191,7 @@ function startMode(mode, category) {
     const set = SETS.find(x => x.id === category);
     if(!set) { alert('セットが見つかりません。'); state.screen='home'; render(); return; }
     state.set = set;
+    state.leadOpen = true;   // 最初は開いた状態で読ませる
     state.questions = set.qs.map((q, j) => ({
       id: 'S:' + set.id + ':' + j,
       c: 6, d: set.d, l: 3, q: q.q, a: q.a, k: q.k, e: q.e, s: set.src, img: q.img
@@ -2204,6 +2268,31 @@ function showFeedback() {
 
   fbEl.className = 'fb ' + (isCorrect ? 'ok' : 'ng');
   fbEl.innerHTML = '<div class="hd">' + (isCorrect ? '✓ 正解！' : '✗ 不正解') + '</div><strong>解説：</strong>' + q.e;
+}
+
+// ===== 折りたたみ =====
+const FOLDKEY = 'chigaku_fold_v1';
+
+function loadFold() {
+  try { const r = localStorage.getItem(FOLDKEY); return r ? JSON.parse(r) : {}; }
+  catch(e) { return {}; }
+}
+
+function isFolded(key) {
+  return loadFold()[key] === 1;
+}
+
+function toggleFold(key) {
+  const f = loadFold();
+  f[key] = f[key] === 1 ? 0 : 1;
+  try { localStorage.setItem(FOLDKEY, JSON.stringify(f)); } catch(e) {}
+  render();
+}
+
+/* 演習中のリード文。折りたたんでも内容は保持され、いつでも開き直せる */
+function toggleLead() {
+  state.leadOpen = !state.leadOpen;
+  render();
 }
 
 function zoomFig(src) {
