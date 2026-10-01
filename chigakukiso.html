@@ -217,6 +217,18 @@ table.br td.num{text-align:right;white-space:nowrap;}
 .ucard:nth-child(2) .urow b{color:#1d6b48;}
 .badgeon{background:#1f6fb2;color:#fff;border-radius:999px;padding:3px 11px;font-weight:700;font-size:12px;}
 .ucard:nth-child(2) .badgeon{background:#2f9e6e;}
+.ucard.exam{border-color:#e8a33d;background:linear-gradient(135deg,#fffaf2,#fdf0d9);
+  box-shadow:0 0 0 2px rgba(232,163,61,.28);}
+.ucard.exam:hover{border-color:#d98f21;box-shadow:0 5px 16px rgba(217,143,33,.30);}
+.ucard.exam .unum{background:#d98f21;}
+.ucard.exam .ubar{background:#f3e3c6;}
+.ucard.exam .urow b{color:#b5741a;}
+.ucard.exam .badgeon{background:#d98f21;}
+.examtag{display:inline-block;margin-left:8px;font-size:11.5px;font-weight:800;letter-spacing:.06em;
+  background:#c0392b;color:#fff;border-radius:6px;padding:2px 9px;vertical-align:2px;}
+.exambar{border:1px solid #e8a33d;background:#fffaf2;color:#8a5a12;border-radius:10px;
+  padding:10px 13px;font-size:13.5px;margin:0 0 12px;line-height:1.6;}
+.exambar b{font-size:15px;color:#b5741a;}
 .badgeoff{background:#e6ecf4;color:#7c8ea6;border-radius:999px;padding:3px 11px;font-size:12px;}
 .tab.back{flex:0 1 auto;min-width:130px;background:#f3f7fd;color:var(--sub);font-size:13px;}
 .tab.back small{display:block;font-size:11px;opacity:.85;}
@@ -2281,6 +2293,14 @@ KC_IDS.forEach(k=>{
 const SEC_CODE = {};
 const SEC_SEQ  = {};
 
+/* ===================================================================
+   ★★★ 先生用：今回の考査範囲 ★★★
+   考査範囲の単元 id を下に書くと、単元をえらぶ画面と小単元の画面に
+   「考査範囲」と表示されます。id は下の UNITS にある "u22" などです。
+   考査が終わって表示を消すときは "" にしてください。
+   =================================================================== */
+const EXAM_SCOPE = "u22";   // 第2章 第2節 火山活動
+
 const UNITS = [
   {id:"u22", ch:2, no:2, name:"火山活動",             pages:"教科書 p.46–65",
    secs:["v1","v2","v3","v4","v5","v6"]},
@@ -2747,6 +2767,14 @@ function askSid(after){
 }
 
 /* ---------- トップ（単元をえらぶ） ---------- */
+/* 今回の考査範囲を知らせる帯。EXAM_SCOPE が空なら何も出さない。 */
+function examBar(){
+  const u = UNITS.find(x=>x.id===EXAM_SCOPE);
+  if(!u) return "";
+  return `<div class="exambar">今回の<b>考査範囲</b>は　<b>${esc(u.name)}</b>　です。
+    （${u.label}　${u.pages}）<br>下の「考査範囲」と書かれた単元を、くりかえし確認しておきましょう。</div>`;
+}
+
 function renderTop(){
   if(!S.sid){ askSid(()=>render()); return; }
   const cards = UNITS.map(u=>{
@@ -2754,8 +2782,8 @@ function renderTop(){
     const m = ks.filter(k=>S.kc[k].mastered).length;
     const pct = Math.round(m/ks.length*100);
     const done = u.secs.filter(sc=>lastResult(u.id,sc)).length;
-    return `<div class="ucard" data-u="${u.id}">
-      <div class="unum">${u.label}</div>
+    return `<div class="ucard${u.id===EXAM_SCOPE?' exam':''}" data-u="${u.id}">
+      <div class="unum">${u.label}</div>${u.id===EXAM_SCOPE?`<span class="examtag">考査範囲</span>`:""}
       <div class="uttl">${esc(u.name)}</div>
       <div class="usub">${u.pages}　${u.n}問　小単元 ${u.secs.length}</div>
       <div class="ubar"><i style="width:${pct}%"></i></div>
@@ -2770,6 +2798,7 @@ function renderTop(){
       ${sidBar()}
       <p class="ttl" style="margin-top:14px;">どの単元をやりますか</p>
       <p class="muted" style="margin:0 0 12px;">${new Date().getMonth()+1}月${new Date().getDate()}日</p>
+      ${examBar()}
       <div class="ucards">${cards}</div>
       ${out?`<div class="warn">未送信の記録が ${out} 件あります。ネットにつながったら自動で送られます。
         <button class="btn ghost tiny" id="flush">いま送る</button></div>`:""}
@@ -2810,7 +2839,7 @@ function renderCheckList(){
   app.innerHTML = `
     <div class="panel">
       ${sidBar()}
-      <p class="ttl" style="margin-top:14px;">${U().label}　${esc(U().name)}</p>
+      <p class="ttl" style="margin-top:14px;">${U().label}　${esc(U().name)}${curUnit===EXAM_SCOPE?`<span class="examtag">考査範囲</span>`:""}</p>
       <p class="muted" style="margin:0 0 12px;">授業でやった小単元を選んで、確認テストを受けてください。結果は先生に送られます。</p>
       <div class="scards">${cards}</div>
       <div class="note" style="margin-top:14px;">
