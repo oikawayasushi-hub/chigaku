@@ -230,6 +230,19 @@ table.br td.num{text-align:right;white-space:nowrap;}
   padding:10px 13px;font-size:13.5px;margin:0 0 12px;line-height:1.6;}
 .exambar b{font-size:15px;color:#b5741a;}
 .badgeoff{background:#e6ecf4;color:#7c8ea6;border-radius:999px;padding:3px 11px;font-size:12px;}
+.exambar .examrow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:7px;}
+.exambar .examu{font-weight:800;color:#b5741a;font-size:12.5px;margin-right:2px;}
+.exambar .examsec{background:#fff;border:1px solid #edc98c;border-radius:999px;
+  padding:2px 10px;font-size:12.5px;color:#8a5a12;}
+.exambar .examsec b{font-size:12.5px;color:#b5741a;margin-right:4px;}
+.exambar .examnote{margin-top:8px;font-size:12.5px;line-height:1.55;}
+.offtag{display:inline-block;margin-left:8px;font-size:11.5px;font-weight:700;letter-spacing:.06em;
+  background:#eef2f8;color:#93a5bd;border-radius:6px;padding:2px 9px;vertical-align:2px;}
+.scard.off{background:#fafbfd;}
+.scard.off .stitle{color:#8c9bb0;}
+.scopebar{font-size:12.5px;color:#8a5a12;background:#fffaf2;border:1px solid #edc98c;
+  border-radius:9px;padding:8px 12px;margin:0 0 12px;line-height:1.6;}
+.scopebar b{color:#b5741a;}
 .tab.back{flex:0 1 auto;min-width:130px;background:#f3f7fd;color:var(--sub);font-size:13px;}
 .tab.back small{display:block;font-size:11px;opacity:.85;}
 .tab.back:hover{background:#e7f0fa;color:var(--accent);}
@@ -338,12 +351,12 @@ const SHEET_URL = "https://script.google.com/macros/s/AKfycbx-oCMhP6T10z7wcFXvkw
    ========================================================= */
 
 const SECTIONS = {
-  s1:"1 大気の構成と特徴①（p.72-73）",
-  s2:"2 大気の構成と特徴②（p.74-75）",
-  s3:"3 対流圏における水の変化（p.76-77）",
-  s4:"4 太陽放射と地球放射（p.80-81）",
-  s5:"5 地球を出入りするエネルギー（p.82-83）",
-  s6:"6 十種雲形（p.78-79）"
+  s1:"1 大気の構成と特徴①（p.70-71）",
+  s2:"2 大気の構成と特徴②（p.72-73）",
+  s3:"3 対流圏における水の変化（p.74-75）",
+  s4:"4 太陽放射と地球放射（p.78-79）",
+  s5:"5 地球を出入りするエネルギー（p.80-81）",
+  s6:"6 十種雲形（p.76-77）"
 };
 
 /* 十種雲形の模式図（図中の A〜J を判別する問題で使用） */
@@ -377,7 +390,7 @@ const BASIC = [
  exp:"大気は地球の重力にとらえられており、その存在する範囲を大気圏という。上端は地表から約800〜1000 km とされる。"},
 {sec:"s1",q:"大気圏の上端は、地表からおよそ何 km のところとされているか。",
  c:["約80〜100 km","約300〜500 km","約800〜1000 km","約5000 km"],ai:2,
- exp:"教科書 p.72「大気は、上空にいくほど薄くなり、やがて存在しなくなる。大気圏の上端は、地表から800〜1000 km とされている」。\n★まぎらわしい点：500 km は【熱圏の上端】であって、大気圏の上端ではない。\n　高度約80〜500 km ＝ 熱圏／高度500 km 以上 ＝ 外気圏（p.75 脚注）。\n　大気圏＝対流圏＋成層圏＋中間圏＋熱圏＋外気圏 で、その全体の上端が800〜1000 km。"},
+ exp:"教科書 p.70「大気は、上空にいくほど薄くなり、やがて存在しなくなる。大気圏の上端は、地表から800〜1000 km とされている」。\n★まぎらわしい点：500 km は【熱圏の上端】であって、大気圏の上端ではない。\n　高度約80〜500 km ＝ 熱圏／高度500 km 以上 ＝ 外気圏（p.73 脚注）。\n　大気圏＝対流圏＋成層圏＋中間圏＋熱圏＋外気圏 で、その全体の上端が800〜1000 km。"},
 {sec:"s1",q:"水蒸気を除いた大気の組成（体積%）で、最も多い成分はどれか。",
  c:["酸素","窒素","二酸化炭素","アルゴン"],ai:1,
  exp:"窒素 約78％＞酸素 約21％＞アルゴン 0.9％＞二酸化炭素 0.04％ の順。"},
@@ -466,7 +479,7 @@ const BASIC = [
  exp:"流星は熱圏の下部から発光し始め、中間圏上部で消滅することが多い。"},
 {sec:"s2",q:"高度500 km 以上の大気圏の範囲を何というか。",
  c:["外気圏","熱圏","中間圏","圏界面"],ai:0,
- exp:"高度500 km 以上を外気圏という（教科書 p.75 脚注）。熱圏は約80〜500 km。\n★外気圏も大気圏の一部。だから「大気圏の上端＝800〜1000 km」であって、500 km ではない。"},
+ exp:"高度500 km 以上を外気圏という（教科書 p.73 脚注）。熱圏は約80〜500 km。\n★外気圏も大気圏の一部。だから「大気圏の上端＝800〜1000 km」であって、500 km ではない。"},
 
 /* --- s3 --- */
 {sec:"s3",q:"物質の状態変化にともなって出入りする熱を何というか。",
@@ -591,7 +604,7 @@ const BASIC = [
  c:["雲が太陽放射を反射するから","雲が地表からの赤外線を吸収し、雲から放射された赤外線の一部が地表を暖めるから","雲が風を弱めるから","雲の中で潜熱が吸収されるから"],ai:1,
  exp:"雲が地表からの赤外線を吸収し、雲からも赤外線が放射されてその一部が地表を暖めるため、冷却が弱まる。"},
 
-/* --- s6 十種雲形（p.78-79 フォトギャラリー） --- */
+/* --- s6 十種雲形（p.76-77 フォトギャラリー） --- */
 {sec:"s6",img:1,q:"図の A の雲の名称はどれか。",
  c:["巻雲（すじ雲）","巻積雲（うろこ雲）","巻層雲（うす雲）","高積雲（ひつじ雲）"],ai:0,
  exp:"A は巻雲（すじ雲）。上層（高度5〜13 km）にでき、白い絵の具を刷毛ではいたように見える。秋の晴天のときにしばしば生じる。\n★「巻」がつく3つ（巻雲・巻積雲・巻層雲）が上層の雲。氷の粒でできている。"},
@@ -621,7 +634,7 @@ const BASIC = [
  exp:"I は積乱雲（入道雲）。雷雲ともよばれ、ときには雹や竜巻を伴った激しい雨を降らす。雲頂が圏界面に達すると、それ以上は上昇できずに横に広がる（かなとこ雲）。\n★下層から上層まで、全層にまたがって発達する唯一の雲。"},
 {sec:"s6",img:1,q:"図の J の雲の名称はどれか。地表のすぐ近くに広がっている。",
  c:["層雲","層積雲（うね雲）","積雲（わた雲）","乱層雲（雨雲）"],ai:0,
- exp:"J は層雲。地表から600 m くらいまでの低いところに現れる雲で、雲底が地表に接すると「霧」とよばれる。\n★放射冷却で地表付近の気温が露点に達すると霧が発生する（p.83）ことと結びつけて覚える。"},
+ exp:"J は層雲。地表から600 m くらいまでの低いところに現れる雲で、雲底が地表に接すると「霧」とよばれる。\n★放射冷却で地表付近の気温が露点に達すると霧が発生する（p.81）ことと結びつけて覚える。"},
 
 {sec:"s6",q:"雲を形によって10種類に分類したものを十種雲形という。この分類を決めているのはどれか。",
  c:["世界気象機関（WMO）発行の「国際雲図帳」","日本の気象庁が定めた観測指針","国際地質科学連合（IUGS）の分類表","国際宇宙ステーションの観測基準"],ai:0,
@@ -982,15 +995,15 @@ const MAP_E = ["K04:3","K03:3","K11:3","K13:3","K12:3","K11:3","K13:3","K14:3","
 });
 
 /* =========================================================
-   第3章 第2節　大気と海水の運動（教科書 p.86-103）
+   第3章 第2節　大気と海水の運動（教科書 p.84-101）
    ========================================================= */
 const SECTIONS_2 = {
-  t1:"1 エネルギー収支の緯度分布（p.86-87）",
-  t2:"2 風（p.88-89）",
-  t3:"3 大気の大循環（p.90-93）",
-  t4:"4 海洋の構造（p.94-95）",
-  t5:"5 海洋の大循環（p.96-97）",
-  t6:"6 エルニーニョ現象とラニーニャ現象（p.98-99）"
+  t1:"1 エネルギー収支の緯度分布（p.84-85）",
+  t2:"2 風（p.86-87）",
+  t3:"3 大気の大循環（p.88-91）",
+  t4:"4 海洋の構造（p.92-93）",
+  t5:"5 海洋の大循環（p.94-95）",
+  t6:"6 エルニーニョ現象とラニーニャ現象（p.96-97）"
 };
 
 const KCS_2 = {
@@ -1427,15 +1440,15 @@ const ITEMS_2 = [
 ];
 
 /* =========================================================
-   第2章 第2節　火山活動（教科書 p.46–65）
+   第2章 第2節　火山活動（教科書 p.44–63）
    ========================================================= */
 const SECTIONS_3 = {
-  v1:"1 火山の分布（p.46-47）",
-  v2:"2 火山の形成とマグマ（p.48-49）",
-  v3:"3 火山の噴火（p.50-51）",
-  v4:"4 火山の地形（p.52-53）",
-  v5:"5 火成岩の形成（p.56-57）",
-  v6:"6 火成岩の種類（p.58-59）"
+  v1:"1 火山の分布（p.44-45）",
+  v2:"2 火山の形成とマグマ（p.46-47）",
+  v3:"3 火山の噴火（p.48-49）",
+  v4:"4 火山の地形（p.50-51）",
+  v5:"5 火成岩の形成（p.54-55）",
+  v6:"6 火成岩の種類（p.56-57）"
 };
 
 const KCS_3 = {
@@ -2255,7 +2268,7 @@ const ITEMS_ADD9 = [
 {kc:"V13",lv:2,q:"深成岩の薄片で、六角形など本来の結晶面をもつ鉱物Ｘと、そのすき間を埋めている鉱物Ｙが見られた。ＸとＹについて正しいものはどれか。",
  c:["Ｙのほうが先に結晶になった","同時に結晶になった","形からはどちらが先か判断できない","Ｘのほうが先に結晶になった"],ai:3,
  exp:"自形（Ｘ）はじゃまされずに成長できた＝先に結晶になった鉱物。他形（Ｙ）はすでにある結晶のすき間を埋めた＝あとから結晶になった鉱物。形が結晶になった順番を教えてくれる。"},
-{kc:"V13",lv:3,src:"教科書 p.57 TRY（深成岩のスケッチから成長の順番を読み取る）",q:"深成岩のスケッチで、鉱物Ａは自形、鉱物Ｂは半自形、鉱物Ｃは他形だった。結晶になった順番として正しいものはどれか。",
+{kc:"V13",lv:3,src:"教科書 p.55 TRY（深成岩のスケッチから成長の順番を読み取る）",q:"深成岩のスケッチで、鉱物Ａは自形、鉱物Ｂは半自形、鉱物Ｃは他形だった。結晶になった順番として正しいものはどれか。",
  c:["Ｃ→Ｂ→Ａ","Ａ→Ｂ→Ｃ","Ｂ→Ａ→Ｃ","同時にできたので順番はない"],ai:1,
  exp:"自形＝いちばん先、半自形＝途中、他形＝いちばんあと。よってＡ→Ｂ→Ｃ。\n★結晶面がどれだけ残っているかが、そのまま結晶になった順番を示している。"},
 
@@ -2265,6 +2278,21 @@ const ITEMS_ADD9 = [
  exp:"大きさのそろった鉱物がすき間なく組み合わさる＝等粒状組織＝深成岩。かんらん石・輝石・斜長石は苦鉄質岩の組み合わせなので斑れい岩。\n★玄武岩は化学組成は同じだが斑状組織（火山岩）。組織と鉱物の両方を見て決める。"}
 ];
 ITEMS_3.push(...ITEMS_ADD9);
+
+/* ---- 2026-11 追加：第4回定期考査で問ったことを、そのまま問う問題 ---- */
+ITEMS_K.push(
+{kc:"K11",lv:2,q:"太陽放射の方が地球放射よりも波長が短いのはなぜか。",
+ c:["太陽の表面温度が地球の表面温度より高いから","太陽が地球より遠くにあるから","太陽放射の方がエネルギーの総量が大きいから","地球放射は大気に吸収されるから"],ai:0,
+ exp:"物体は温度が高いほど、波長の短い電磁波を強く放射する。太陽の表面温度（約6000 K）は地球の表面温度（約288 K）よりはるかに高いので、太陽放射は可視光線が中心、地球放射は赤外線が中心になる。\n★「遠い」「量が多い」は波長のちがいの理由にならない。"}
+);
+ITEMS_M.push(
+{kc:"M01",lv:2,q:"低緯度と高緯度のエネルギー収支を、正しく述べたものはどれか。",
+ c:["低緯度では太陽放射が地球放射より多く過剰になり、高緯度では地球放射の方が多く不足になる","低緯度では不足し、高緯度では過剰になる","どの緯度でも過剰になっている","どの緯度でも不足している"],ai:0,
+ exp:"低緯度では受け取る太陽放射が出ていく地球放射より多いのでエネルギーが過剰になり、高緯度では逆に不足する。\nこの過剰と不足をうめるように、大気と海洋が低緯度から高緯度へ熱を運んでいる。"},
+{kc:"M08",lv:2,q:"極付近で大気が下降するのはなぜか。",
+ c:["冷やされて大気の密度が大きくなるから","暖められて大気が膨張するから","水蒸気が凝結して熱を放出するから","転向力がはたらくから"],ai:0,
+ exp:"極付近では大気が強く冷やされて密度が大きくなり、重くなって下降する。その結果できる高圧帯が極高圧帯で、ここから低緯度側へ吹き出す東寄りの風が極偏東風である。"}
+);
 
 /* ---- 単元を統合する ---- */
 Object.assign(SECTIONS, SECTIONS_2, SECTIONS_3);
@@ -2295,18 +2323,37 @@ const SEC_SEQ  = {};
 
 /* ===================================================================
    ★★★ 先生用：今回の考査範囲 ★★★
-   考査範囲の単元 id を下に書くと、単元をえらぶ画面と小単元の画面に
-   「考査範囲」と表示されます。id は下の UNITS にある "u22" などです。
-   考査が終わって表示を消すときは "" にしてください。
+   考査範囲の「小単元コード」を下に並べると、次の3つが自動で切りかわります。
+     ① 単元をえらぶ画面に「今回の考査範囲」の帯が出る
+     ② 小単元の一覧に「考査範囲」「範囲外」の印がつく
+     ③ 「復習演習」と「ふりかえり」が、考査範囲の項目だけになる
+   コードは小単元カードの左に出ている3桁の数字（311 など）。
+   考査が終わって印を消すときは  const EXAM_SCOPE = [];  にしてください。
    =================================================================== */
-const EXAM_SCOPE = "";   // 例）"u22" と書くと 第2章 第2節 火山活動 が考査範囲として表示される
+const EXAM_NAME  = "第4回定期考査";
+const EXAM_PAGES = "教科書 p.68〜91";
+const EXAM_SCOPE = ["311","312","313","314","315","321","322","323"];
+
+const EXAM_ON = EXAM_SCOPE.length > 0;
+function inScope(sec){ return EXAM_ON && EXAM_SCOPE.indexOf(SEC_CODE[sec]) >= 0; }
+function unitInScope(uid){
+  const u = UNITS.find(x=>x.id===uid);
+  return !!(u && u.secs.some(inScope));
+}
+function scopeSecs(uid){
+  const u = UNITS.find(x=>x.id===uid);
+  return u ? u.secs.filter(inScope) : [];
+}
+function secName(sc){
+  return String(SECTIONS[sc]||"").replace(/^\d+\s*/,"").replace(/（[^）]*）\s*$/,"");
+}
 
 const UNITS = [
-  {id:"u22", ch:2, no:2, name:"火山活動",             pages:"教科書 p.46–65",
+  {id:"u22", ch:2, no:2, name:"火山活動",             pages:"教科書 p.44–63",
    secs:["v1","v2","v3","v4","v5","v6"]},
-  {id:"u31", ch:3, no:1, name:"地球のエネルギー収支", pages:"教科書 p.70–85",
+  {id:"u31", ch:3, no:1, name:"地球のエネルギー収支", pages:"教科書 p.68–83",
    secs:["s1","s2","s3","s4","s5","s6"]},
-  {id:"u32", ch:3, no:2, name:"大気と海水の運動",     pages:"教科書 p.86–103",
+  {id:"u32", ch:3, no:2, name:"大気と海水の運動",     pages:"教科書 p.84–101",
    secs:["t1","t2","t3","t4","t5","t6"]}
 ];
 UNITS.sort((a,b)=> a.ch-b.ch || a.no-b.no);          /* 教科書の章順にならべる */
@@ -2317,6 +2364,10 @@ UNITS.forEach(u=>{
 });
 
 UNITS.forEach(u=>u.secs.forEach((sc,i)=>{ SEC_CODE[sc] = String(u.ch) + u.no + (i+1); }));
+/* 考査範囲にしあったときの問題数（範囲の設定がない単元は全問数と同じ） */
+UNITS.forEach(u=>{
+  u.nScope = unitInScope(u.id) ? ALL.filter(q=>q.unit===u.id && inScope(q.sec)).length : u.n;
+});
 ALL.forEach(q=>{
   SEC_SEQ[q.sec] = (SEC_SEQ[q.sec]||0) + 1;
   q.qid = SEC_CODE[q.sec] + "-" + String(SEC_SEQ[q.sec]).padStart(2,"0");
@@ -2392,7 +2443,15 @@ function markToday(){
 /* =========================================================
    出題の決定（設計書 Rule 3：新規40% / 復習40% / 弱点補修20%）
    ========================================================= */
-function unitKCs(u){ return KC_IDS.filter(k=>KCS[k].unit===u); }
+function unitKCsAll(u){ return KC_IDS.filter(k=>KCS[k].unit===u); }
+/* 考査範囲が設定されていて、その単元に範囲内の小単元があるときは、
+   範囲内の項目だけを返す。「復習演習」の出題プールも「ふりかえり」の一覧も
+   これを使っているので、範囲外（海洋など）からは出題されない。 */
+function unitKCs(u){
+  const all = unitKCsAll(u);
+  if(!unitInScope(u)) return all;
+  return all.filter(k=>inScope(KCS[k].sec));
+}
 
 function shuffled(a){
   const r=a.slice();
@@ -2520,7 +2579,7 @@ function deferKC(kc){ S.kc[kc].deferOn = todayStr(); saveState(); }
 /* =========================================================
    スプレッドシートへの送信
    ========================================================= */
-const APP_VER = "4.2";
+const APP_VER = "4.3";
 const CHECK_N   = 10;      // 小単元ごとの確認テストの問題数
 const PASS_RATE = 0.8;     // 合格ライン（8割）
 
@@ -2697,6 +2756,7 @@ let curUnit = null, curSec = null;
 let queue = [], idx = 0, attempt = 0, answered = false;
 let picked = new Set();
 let sessLog = [], sessKcs = [], sessStart = 0, sessKind = "check";
+let lookAll = false;          /* ふりかえりで範囲外も表示するか */
 let sendState = "";
 
 function esc(s){ return (s==null?"":String(s)).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
@@ -2769,10 +2829,16 @@ function askSid(after){
 /* ---------- トップ（単元をえらぶ） ---------- */
 /* 今回の考査範囲を知らせる帯。EXAM_SCOPE が空なら何も出さない。 */
 function examBar(){
-  const u = UNITS.find(x=>x.id===EXAM_SCOPE);
-  if(!u) return "";
-  return `<div class="exambar">今回の<b>考査範囲</b>は　<b>${esc(u.name)}</b>　です。
-    （${u.label}　${u.pages}）<br>下の「考査範囲」と書かれた単元を、くりかえし確認しておきましょう。</div>`;
+  if(!EXAM_ON) return "";
+  const rows = UNITS.filter(u=>unitInScope(u.id)).map(u=>{
+    const tags = scopeSecs(u.id).map(sc=>
+      `<span class="examsec"><b>${SEC_CODE[sc]}</b>${esc(secName(sc))}</span>`).join("");
+    return `<div class="examrow"><span class="examu">${u.label}</span>${tags}</div>`;
+  }).join("");
+  return `<div class="exambar">今回の<b>考査範囲</b>（${esc(EXAM_NAME)}）は　<b>${esc(EXAM_PAGES)}</b>　です。
+    ${rows}
+    <div class="examnote"><span class="examtag">考査範囲</span> の印がついた小単元を、くりかえし確認しておきましょう。<br>
+    「復習演習」と「ふりかえり」は、範囲内の項目だけになっています。</div></div>`;
 }
 
 function renderTop(){
@@ -2781,13 +2847,15 @@ function renderTop(){
     const ks = unitKCs(u.id);
     const m = ks.filter(k=>S.kc[k].mastered).length;
     const pct = Math.round(m/ks.length*100);
-    const done = u.secs.filter(sc=>lastResult(u.id,sc)).length;
-    return `<div class="ucard${u.id===EXAM_SCOPE?' exam':''}" data-u="${u.id}">
-      <div class="unum">${u.label}</div>${u.id===EXAM_SCOPE?`<span class="examtag">考査範囲</span>`:""}
+    const on = unitInScope(u.id);
+    const mysecs = on ? scopeSecs(u.id) : u.secs;
+    const done = mysecs.filter(sc=>lastResult(u.id,sc)).length;
+    return `<div class="ucard${on?' exam':''}" data-u="${u.id}">
+      <div class="unum">${u.label}</div>${on?`<span class="examtag">考査範囲</span>`:""}
       <div class="uttl">${esc(u.name)}</div>
-      <div class="usub">${u.pages}　${u.n}問　小単元 ${u.secs.length}</div>
+      <div class="usub">${u.pages}　${on?`考査範囲 ${u.nScope}問（全${u.n}問）`:`${u.n}問`}　小単元 ${mysecs.length}${on?`/${u.secs.length}`:""}</div>
       <div class="ubar"><i style="width:${pct}%"></i></div>
-      <div class="urow"><span>確認ずみの小単元 <b>${done}</b>/${u.secs.length}　習得 ${m}/${ks.length}</span>
+      <div class="urow"><span>確認ずみの小単元 <b>${done}</b>/${mysecs.length}　習得 ${m}/${ks.length}</span>
         <span class="badgeon">はじめる</span></div>
     </div>`;
   }).join("");
@@ -2807,7 +2875,7 @@ function renderTop(){
     </div>`;
   bindSid();
   document.querySelectorAll(".ucard").forEach(c=>{
-    c.onclick=()=>{ curUnit=c.dataset.u; view="check"; render(); };
+    c.onclick=()=>{ curUnit=c.dataset.u; view="check"; lookAll=false; render(); };
   });
   const ad=$("#adm"); if(ad) ad.onclick=(e)=>{ e.preventDefault(); view="admin"; render(); };
   const f=$("#flush"); if(f) f.onclick=async()=>{ f.textContent="送信中…"; await flushOutbox(); render(); };
@@ -2826,8 +2894,11 @@ function renderCheckList(){
     const n = secItems(sc).length;
     const r = lastResult(curUnit, sc);
     const take = Math.min(CHECK_N, n);
-    return `<div class="scard" data-s="${sc}">
-      <div class="stitle"><span class="qcode">${SEC_CODE[sc]}</span>${esc(SECTIONS[sc])}</div>
+    const sp = unitInScope(curUnit), on = inScope(sc);
+    const tag = sp ? (on ? `<span class="examtag">考査範囲</span>`
+                         : `<span class="offtag">範囲外</span>`) : "";
+    return `<div class="scard${sp&&!on?' off':''}" data-s="${sc}">
+      <div class="stitle"><span class="qcode">${SEC_CODE[sc]}</span>${esc(SECTIONS[sc])}${tag}</div>
       <div class="srow">
         <span class="smeta">確認テスト ${take}問（${Math.ceil(take*PASS_RATE)}問で合格）　この小単元 全${n}問</span>
         ${r? `<span class="sres ${r.pass==="合格"?'good':'low'}">前回 ${r.ok}/${r.n}　${r.pass}</span>`
@@ -2839,7 +2910,7 @@ function renderCheckList(){
   app.innerHTML = `
     <div class="panel">
       ${sidBar()}
-      <p class="ttl" style="margin-top:14px;">${U().label}　${esc(U().name)}${curUnit===EXAM_SCOPE?`<span class="examtag">考査範囲</span>`:""}</p>
+      <p class="ttl" style="margin-top:14px;">${U().label}　${esc(U().name)}${unitInScope(curUnit)?`<span class="examtag">考査範囲</span>`:""}</p>
       <p class="muted" style="margin:0 0 12px;">授業でやった小単元を選んで、確認テストを受けてください。結果は先生に送られます。</p>
       <div class="scards">${cards}</div>
       <div class="note" style="margin-top:14px;">
@@ -2857,9 +2928,11 @@ function renderDrill(){
   const ks = unitKCs(curUnit);
   const o = drillOrder(curUnit);
   const mastered = ks.filter(k=>S.kc[k].mastered).length;
-  const n = Math.min(DRILL_N, U().n);
+  const sp = unitInScope(curUnit);
+  const mysecs = sp ? scopeSecs(curUnit) : U().secs;
+  const n = Math.min(DRILL_N, sp ? U().nScope : U().n);
   const need = Math.ceil(n*PASS_RATE);
-  const doneSecs = U().secs.filter(sc=>lastResult(curUnit,sc)).length;
+  const doneSecs = mysecs.filter(sc=>lastResult(curUnit,sc)).length;
   const mix = [ o.weak.length ? "にがて "+o.weak.length : "",
                 o.review.length ? "復習どき "+o.review.length : "",
                 o.fresh.length ? "はじめて "+o.fresh.length : "",
@@ -2869,10 +2942,12 @@ function renderDrill(){
     <div class="panel">
       ${sidBar()}
       <p class="ttl" style="margin-top:14px;">復習演習　－　${U().label}</p>
-      <p class="muted" style="margin:0 0 12px;">小単元の枠をこえて、節全体から出題します。<b>いつでも、何回でも</b>できます。</p>
+      <p class="muted" style="margin:0 0 12px;">小単元の枠をこえて出題します。<b>いつでも、何回でも</b>できます。</p>
+      ${sp?`<div class="scopebar"><b>考査範囲だけ</b>から出題します（${mysecs.map(x=>SEC_CODE[x]).join("・")}）。
+        範囲外の小単元は出ません。範囲外をやるときは「授業の確認」から選んでください。</div>`:""}
       <div class="stats">
         <div class="stat"><b>${mastered}<small>/${ks.length}</small></b><span>習得できた項目</span></div>
-        <div class="stat"><b>${doneSecs}<small>/${U().secs.length}</small></b><span>確認ずみの小単元</span></div>
+        <div class="stat"><b>${doneSecs}<small>/${mysecs.length}</small></b><span>確認ずみの小単元</span></div>
         <div class="stat"><b>${n}<small>問</small></b><span>出題数</span></div>
       </div>
       <div class="cards" style="margin-top:14px;">
@@ -3116,7 +3191,8 @@ function drawResult(data, rate, need, passed, sendMsg, state){
 /* ---------- ふりかえり ---------- */
 function renderLook(){
   const t = todayStr();
-  const ks = unitKCs(curUnit);
+  const sp = unitInScope(curUnit);
+  const ks = (sp && !lookAll) ? unitKCs(curUnit) : unitKCsAll(curUnit);
   const mastered = ks.filter(k=>S.kc[k].mastered).length;
   const learning = ks.filter(k=>!S.kc[k].mastered && S.kc[k].seen>0).length;
   let rev=0, revOk=0; ks.forEach(k=>{ rev+=S.kc[k].rev; revOk+=S.kc[k].revOk; });
@@ -3141,6 +3217,11 @@ function renderLook(){
     <div class="panel">
       <p class="ttl">ふりかえり　－　${U().label}</p>
       <p class="muted" style="margin:0 0 12px;">くらべる相手は、過去の自分だけです。</p>
+      ${sp?`<div class="scopebar">${lookAll
+        ? `この節の<b>すべての項目</b>を表示しています。
+           <button class="btn ghost tiny" id="lookTgl">考査範囲だけにする</button>`
+        : `<b>考査範囲</b>（${scopeSecs(curUnit).map(x=>SEC_CODE[x]).join("・")}）の項目だけを表示しています。
+           <button class="btn ghost tiny" id="lookTgl">すべて表示</button>`}</div>`:""}
       <div class="stats">
         <div class="stat"><b>${mastered}<small>/${ks.length}</small></b><span>習得できた項目</span></div>
         <div class="stat"><b>${learning}<small>項目</small></b><span>学習中</span></div>
@@ -3151,6 +3232,7 @@ function renderLook(){
       <table class="br kctab"><tr><th></th><th>できるようになること</th><th class="num">状態</th></tr>${rows}</table>
       <div class="legend"><span class="sq u"></span>未着手　<span class="sq l"></span>学習中　<span class="sq m"></span>習得（別の日に2回連続正解）</div>
     </div>`;
+  const lt = $("#lookTgl"); if(lt) lt.onclick = ()=>{ lookAll = !lookAll; render(); };
 }
 
 /* ---------- 先生用 ---------- */
