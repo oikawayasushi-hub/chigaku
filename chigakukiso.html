@@ -2332,7 +2332,7 @@ const SEC_SEQ  = {};
    =================================================================== */
 const EXAM_NAME  = "第4回定期考査";
 const EXAM_PAGES = "教科書 p.68〜91";
-const EXAM_SCOPE = ["311","312","313","314","315","321","322","323"];
+const EXAM_SCOPE = [];   // 例）["311","312"] のように小単元コードを並べると考査範囲として表示される
 
 const EXAM_ON = EXAM_SCOPE.length > 0;
 function inScope(sec){ return EXAM_ON && EXAM_SCOPE.indexOf(SEC_CODE[sec]) >= 0; }
