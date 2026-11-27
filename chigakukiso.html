@@ -285,6 +285,12 @@ table.br td.num{text-align:right;white-space:nowrap;}
 .sidinput:focus{outline:none;border-color:var(--accent);}
 .siderr{color:#c8394c;font-size:13px;margin:8px 0 0;min-height:1.2em;}
 
+.vrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center;}
+.vrow .vhead{font-size:12px;color:var(--sub);font-weight:700;margin-right:2px;}
+a.vlink{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;text-decoration:none;color:#b3261e;
+  background:#fff;border:1px solid #f0c4c0;border-radius:999px;padding:2px 10px;line-height:1.6;}
+a.vlink span{color:#8a6f6d;font-size:11px;}
+a.vlink:hover{background:#fff1f0;border-color:#e08a83;}
 .scards{display:flex;flex-direction:column;gap:10px;}
 .scard{border:1px solid var(--line);background:#fbfdff;border-radius:12px;padding:13px 16px;cursor:pointer;transition:.12s;}
 .scard:hover{background:#eef6ff;border-color:var(--accent);transform:translateY(-1px);}
@@ -3259,6 +3265,48 @@ const ITEMS_5 = [
  exp:"地球は自転周期が約24時間と短いため昼夜の温度差が小さい。さらに大気が熱を逃がしにくくし、海洋が気温の変動を抑えている。水星は大気がなく自転周期が長い。\n★自転軸の傾きは季節変化の原因。"}
 ];
 
+
+/* =========================================================
+   参考動画（YouTube「地学基礎の完全学習」）
+   VIDEO_SEC の各要素は [回, 開始秒, 表示用の時刻, チャプター名]。
+   小単元を足したら、ここに1行足すと「授業の確認」と解説の下にリンクが出る。
+   ========================================================= */
+const VIDEO_CH = "https://www.youtube.com/@full.study.geo.2026";
+const VIDEOS = {7:["GMu2JmTgCUs","火山の分布と噴火様式"],8:["HIBNlhEhqa8","火山噴出物と火成岩"],9:["iZR4Q6056uE","大気の構造"],10:["8aXrFicfHcg","水の状態変化と雲の発生"],11:["cvq8tRaNwG4","地球のエネルギー収支"],12:["8wvvVWTVB2A","大気の大循環"],13:["-dgFqMgtD6c","海水の循環"],15:["EJyiEY1B1zw","宇宙の始まりと進化"],16:["WK_7nDtFG1k","宇宙の広がりと恒星の明るさ"],17:["H4XIZDh9Vh0","太陽と恒星の進化"],18:["QnuvaZ6QNVQ","太陽系の誕生"],19:["MX7QvZG6miI","太陽系の天体"]};
+const VIDEO_SEC = {
+  v1:[[7,25,"0:25","活火山"],[7,143,"2:23","火山の分布"],[7,293,"4:53","日本の火山分布"]],
+  v2:[[7,491,"8:11","マグマの生成と噴火"]],
+  v3:[[7,745,"12:25","噴火様式"],[8,12,"0:12","火山噴出物"]],
+  v4:[[7,1017,"16:57","火山の形"],[7,1363,"22:43","カルデラ"]],
+  v5:[[8,44,"0:44","火成岩の産状"],[8,330,"5:30","火成岩の組織"]],
+  v6:[[8,561,"9:21","鉱物"],[8,1339,"22:19","ケイ酸塩鉱物の覚え方"],[8,1460,"24:20","火成岩のまとめ"]],
+  s1:[[9,12,"0:12","大気の組成"],[9,138,"2:18","気圧"]],
+  s2:[[9,482,"8:02","大気の層構造"]],
+  s3:[[10,52,"0:52","水の状態変化"],[10,226,"3:46","飽和水蒸気圧と相対湿度"],[10,557,"9:17","雲の発生"]],
+  s4:[[11,42,"0:42","地球が受け取る太陽放射"],[11,558,"9:18","放射の強さと波長"]],
+  s5:[[11,809,"13:29","地球のエネルギー収支"],[11,1223,"20:23","温室効果"],[11,1327,"22:07","放射冷却"]],
+  s6:[[10,832,"13:52","十種雲形"]],
+  t1:[[12,52,"0:52","緯度によるエネルギー収支"],[12,228,"3:48","熱の輸送"]],
+  t2:[[12,428,"7:08","風の吹き方"]],
+  t3:[[12,720,"12:00","ハドレー循環"],[12,965,"16:05","極循環"],[12,1069,"17:49","中緯度の循環"],[11,1425,"23:45","潜熱輸送"]],
+  t4:[[13,49,"0:49","海水の塩類と塩分"],[13,229,"3:49","水温の鉛直分布"]],
+  t5:[[13,400,"6:40","風成循環"],[13,690,"11:30","深層の循環"]],
+  t6:[[13,889,"14:49","平常時の赤道太平洋"],[13,986,"16:26","エルニーニョ"],[13,1140,"19:00","ラニーニャ"]],
+  w1:[[16,68,"1:08","銀河と銀河系"]],
+  w2:[[15,195,"3:15","宇宙の誕生"],[15,320,"5:20","陽子と中性子"],[15,460,"7:40","宇宙の晴れ上がり"]],
+  w3:[[15,644,"10:44","暗黒時代から現在"],[16,182,"3:02","銀河系の構造"]],
+  w4:[[17,704,"11:44","恒星の進化"],[17,1044,"17:24","核融合"],[16,434,"7:14","恒星の明るさ"]],
+  w5:[[17,47,"0:47","黒点・白斑・粒状斑"],[17,482,"8:02","彩層・プロミネンス・コロナ"]],
+  x1:[[19,50,"0:50","太陽系の天体"],[19,1166,"19:26","太陽系外縁天体"]],
+  x2:[[18,45,"0:45","太陽系の誕生"],[18,371,"6:11","惑星の層構造"]],
+  x3:[[18,924,"15:24","月の誕生"],[19,852,"14:12","衛星"],[19,918,"15:18","小惑星"],[19,970,"16:10","彗星"]],
+  x4:[[19,139,"2:19","水星・金星"],[19,350,"5:50","地球・火星"],[19,515,"8:35","木星・土星"],[19,731,"12:11","天王星・海王星"]],
+  x5:[[18,605,"10:05","地球の層構造の形成"]]
+};
+function videoLinks(sc){
+  const a = VIDEO_SEC[sc]; if(!a||!a.length) return "";
+  return a.map(([n,t,tt,lab])=>`<a class="vlink" href="https://www.youtube.com/watch?v=${VIDEOS[n][0]}&t=${t}s" target="_blank" rel="noopener" title="第${n}回「${VIDEOS[n][1]}」${tt}から">▶ ${esc(lab)}<span>第${n}回 ${tt}</span></a>`).join("");
+}
 /* ---- 単元を統合する ---- */
 Object.assign(SECTIONS, SECTIONS_2, SECTIONS_3, SECTIONS_4, SECTIONS_5);
 Object.keys(KCS).forEach(k=>{ KCS[k].unit = "u31"; });
@@ -3552,7 +3600,7 @@ function deferKC(kc){ S.kc[kc].deferOn = todayStr(); saveState(); }
 /* =========================================================
    スプレッドシートへの送信
    ========================================================= */
-const APP_VER = "4.5";
+const APP_VER = "4.6";
 const CHECK_N   = 10;      // 小単元ごとの確認テストの問題数
 const PASS_RATE = 0.8;     // 合格ライン（8割）
 
@@ -3877,6 +3925,7 @@ function renderCheckList(){
         ${r? `<span class="sres ${r.pass==="合格"?'good':'low'}">前回 ${r.ok}/${r.n}　${r.pass}</span>`
            : `<span class="sres none">未実施</span>`}
       </div>
+      ${VIDEO_SEC[sc]?`<div class="vrow"><span class="vhead">📺 動画</span>${videoLinks(sc)}</div>`:""}
     </div>`;
   }).join("");
 
@@ -3892,7 +3941,7 @@ function renderCheckList(){
     </div>`;
   bindSid();
   document.querySelectorAll(".scard").forEach(c=>{
-    c.onclick=()=>{ if(!S.sid){ askSid(()=>render()); return; } startSession("check", c.dataset.s); };
+    c.onclick=(e)=>{ if(e.target.closest("a.vlink")) return; if(!S.sid){ askSid(()=>render()); return; } startSession("check", c.dataset.s); };
   });
 }
 
@@ -4051,6 +4100,7 @@ function feedback(kind, q, it){
       <h4>${kind==="ok"?"◯ 正解":(kind==="re"?"◯ 正解（2回目）":"× 不正解")}</h4>
       <div class="modal"><b>答え：${it.ai+1}</b>　${esc(q.c[q.ai])}</div>
       <div style="white-space:pre-wrap;">${esc(q.exp||"")}</div>
+      ${kind!=="ok"&&VIDEO_SEC[q.sec]?`<div class="vrow"><span class="vhead">📺 動画で確認</span>${videoLinks(q.sec)}</div>`:""}
       ${carry}
     </div>
     <div class="btnrow"><button class="btn" id="next">${idx+1<queue.length?"次へ":"終わって結果を送る"}</button></div>`;
